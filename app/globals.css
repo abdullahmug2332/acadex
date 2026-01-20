@@ -1,26 +1,86 @@
 @import "tailwindcss";
 
+
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #ebeefd;
+  --foreground: #2A2E30;
+  --primary: #1F48FF;
+  --secondary: #99ACFF;
+  --bigfont: 'Barlow', sans-serif;
+  --smallfont: 'Inter', sans-serif;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:  var(--smallfont);
+}
+
+
+.btn {
+  background-color: var(--primary) !important;
+  color:white !important;
+  font-family: var(--smallfont);
+  @apply px-[20px] py-[7px] rounded-[5px] font-[400] duration-300 cursor-pointer;
+  
+}
+
+.btn:hover {
+  opacity: 0.8;
+}
+
+
+
+.bg {
+  @apply bg-[var(--primary)]
+}
+
+.color {
+  @apply !text-[var(--primary)]
+}
+
+.hbg {
+  @apply hover:bg-[var(--primary)]
+}
+
+.hcolor {
+  @apply hover:text-[var(--primary)]
+}
+
+.bcolor {
+  @apply !border-[var(--primary)]
+}
+
+.heading {
+  @apply text-[30px] lg:text-[35px] 2xl:text-[40px];
+  font-family: var(--bigfont);
+}
+
+.para {
+  @apply text-[14px] md:text-[15px] lg:text-[16px];
+  font-family: var(--smallfont);
+  color: var(--foreground) !important;
+
+}
+
+.subheading {
+  @apply text-[18px] md:text-[19px] lg:text-[21px];
+  font-family: var(--smallfont);
+}
+
+.pad {
+  @apply py-[30px] lg:py-[50px]
+}
+
+.mar {
+  @apply my-[50px] lg:my-[80px]
+}
+.feild{
+  @apply mt-1  w-full px-3 py-2 border rounded-md shadow-sm focus:outline-[var(--secondary)]  focus:ring-blue-500  sm:text-sm border-[var(--secondary)]
 }
