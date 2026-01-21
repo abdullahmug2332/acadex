@@ -3,9 +3,13 @@
 import "./globals.css";
 import { Barlow, Inter } from 'next/font/google'
 import { Provider } from "react-redux";
-import { store, persistor } from "../store";
-import { PersistGate } from "redux-persist/integration/react";
+import { store, persistor } from "@/store/store";
 
+import Header from "@/components/Header";
+import Sidebar from "@/components/Sidebar";
+import { usePathname } from "next/navigation";
+import OuterLayer from "@/components/OuterLayer";
+import { PersistGate } from "redux-persist/integration/react";
 const barlow = Barlow({
   subsets: ['latin'],
   weight: [
@@ -27,6 +31,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const authRoutes = ["/auth"];
+  const pathname = usePathname();
+  const isAuthRoute = authRoutes.includes(pathname);
   return (
     <html lang="en">
       <head>
@@ -38,7 +45,25 @@ export default function RootLayout({
       >
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
-            {children}
+            {/* Show Header & Sidebar only if NOT auth route */}
+            {!isAuthRoute && (
+              <>
+
+                <Sidebar />
+                <OuterLayer >
+                  <Header />
+                  <div className="p-1 border">
+                    {children}
+                  </div>
+                </OuterLayer>
+              </>
+            )}
+            {isAuthRoute && (
+              <>
+                {children}
+              </>
+            )}
+
           </PersistGate>
         </Provider>
       </body>

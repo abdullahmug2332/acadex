@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
@@ -14,6 +14,7 @@ export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,10 +38,29 @@ export default function Auth() {
       }
     }
   };
+  
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await axios.get("/api/check-auth");
+        if (res.data.authenticated) {
+          router.push("/"); // already logged in
+        } else {
+          setLoading(false); // show login form
+        }
+      } catch (err) {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
+
+  if (loading) return <p>Loading...</p>;
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-[90%] max-w-sm p-6 bg-white rounded-lg shadow-md">
+    <div className="min-h-screen flex items-center justify-center bg2">
+      <div className="w-[90%] max-w-sm p-6 bg-white rounded-lg shadow-lg">
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <img src="/logo.png" alt="Logo" className="w-[70%] object-contain" />

@@ -23,7 +23,7 @@ export default function Home() {
 
   if (!user) return <p>User not logged in</p>;
   return (
-    <div>
+    <div className="border">
       <p>Welcome {user.name}</p>
       <p>Id: {user.id}</p>
       <button
