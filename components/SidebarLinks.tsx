@@ -26,16 +26,16 @@ export default function SidebarLinks({ links }: SidebarLinksProps) {
             key={item.name}
             href={item.link}
             className={`
-              flex items-center gap-3 px-3 py-2 group  hover:bcolor
-              ${isActive ? "border-r-3 bcolor hcolor" : "hcolor"}
+              flex items-center gap-1  sm:gap-3 px-3 py-2 group  hover:bcolor
+              ${isActive ? "border-r-5 bcolor hcolor" : "hcolor"}
             `}
           >
             <span
               className={`
-                text-[15px] md:text-[18px]
-                group-hover:text-[var(--primary)]
+                
+                group-hover:text-[var(--primary)] duration-500
                 ${isActive ? "text-[var(--primary)] " : ""}
-                ${toggle ? " md:pl-[20px]" : "mx-auto"}
+                ${toggle ? " md:pl-[20px] text-[15px] md:text-[18px]" : "mx-auto text-[20px] md:text-[25px]"}
               `}
             >
               {item.icon}
@@ -44,9 +44,9 @@ export default function SidebarLinks({ links }: SidebarLinksProps) {
             {toggle && (
               <span
                 className={`
-                  text-[16px]
+                  text-[13px] sm:text-[16px]
                   group-hover:text-[var(--primary)]
-                  ${isActive ? "text-[var(--primary)] font-[600]" : ""}
+                  ${isActive ? "text-[var(--primary)] " : ""}
                 `}
               >
                 {item.name}

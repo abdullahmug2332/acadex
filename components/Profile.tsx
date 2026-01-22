@@ -26,7 +26,7 @@ export default function Profile() {
     };
 
     return (
-        <div className="hidden justify-center gap-[5px] md:gap-[10px] items-center md:flex">
+        <div className=" justify-center gap-[5px] md:gap-[10px] items-center flex z-[999]">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="p-0 rounded-full focus-visible:ring-0 focus-visible:ring-offset-0 " >
@@ -42,7 +42,7 @@ export default function Profile() {
                     </Button>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent align="end" className="w-60 bg2">
+                <DropdownMenuContent align="end" className="w-30 md:w-60 bg2 z-[999]">
                     <DropdownMenuItem className="">
                         <div className="relative inline-block">
                             <Avatar className="w-[35px] md:w-[40px] h-[35px] md:h-[40px]">

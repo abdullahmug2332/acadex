@@ -37,7 +37,9 @@ export default function Header() {
       <HeaderSearchBar />
       <div className="flex justify-center gap-[10px] lg:gap-[20px] items-center">
         <Notification />
-        <Profile />
+        <div className="hidden md:block">
+          <Profile />
+        </div>
       </div>
     </div>
   )
