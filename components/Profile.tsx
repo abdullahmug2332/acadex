@@ -26,12 +26,12 @@ export default function Profile() {
     };
 
     return (
-        <div className=" justify-center gap-[5px] md:gap-[10px] items-center flex z-[999]">
+        <div className=" justify-center gap-[5px] md:gap-[10px] items-center flex z-[999] cursor-pointer">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="p-0 rounded-full focus-visible:ring-0 focus-visible:ring-offset-0 " >
                         <div className="relative inline-block">
-                            <Avatar className="w-[35px] md:w-[40px] h-[35px] md:h-[40px]">
+                            <Avatar className="w-[35px] md:w-[40px] h-[35px] md:h-[40px] cursor-pointer">
                                 <AvatarImage src="/avatar.png" />
                                 <AvatarFallback>U</AvatarFallback>
                             </Avatar>
@@ -41,7 +41,6 @@ export default function Profile() {
                         </div>
                     </Button>
                 </DropdownMenuTrigger>
-
                 <DropdownMenuContent align="end" className="w-30 md:w-60 bg2 z-[999]">
                     <DropdownMenuItem className="">
                         <div className="relative inline-block">
@@ -65,7 +64,6 @@ export default function Profile() {
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
-
         </div>
     )
 }

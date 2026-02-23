@@ -1,20 +1,42 @@
-'use client'
-import { useEffect, useState } from 'react';
-import { FiEye, FiEyeOff } from 'react-icons/fi';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
+"use client";
+import { useEffect, useState } from "react";
+import { FiEye, FiEyeOff } from "react-icons/fi";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 import { MdErrorOutline } from "react-icons/md";
 import { useAppDispatch } from "@/store/hooks";
 import { setUser, clearUser } from "@/store/userSlice";
+import { Button } from "@/components/ui/button";
 export default function Auth() {
-
   const dispatch = useAppDispatch();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await axios.get("/api/check-auth");
+        if (res.data.authenticated) {
+          console.log("auhenticated");
+          router.replace("/"); 
+          console.log("route pushed");
+
+        } else {
+          console.log("not authenticated");
+
+          setLoading(false); 
+        }
+      } catch (err) {
+        console.log("catch");
+        setLoading(false);
+      }
+    };
+    checkAuth();
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,25 +60,7 @@ export default function Auth() {
       }
     }
   };
-  
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await axios.get("/api/check-auth");
-        if (res.data.authenticated) {
-          router.push("/"); // already logged in
-        } else {
-          setLoading(false); // show login form
-        }
-      } catch (err) {
-        setLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, [router]);
-
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p>Loadingg...</p>;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg2">
@@ -69,7 +73,10 @@ export default function Auth() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
               Email
             </label>
             <input
@@ -83,12 +90,15 @@ export default function Auth() {
           </div>
 
           <div className="relative">
-            <label htmlFor="password" className="text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="text-sm font-medium text-gray-700"
+            >
               Password
             </label>
             <div className="flex items-center">
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -100,15 +110,24 @@ export default function Auth() {
                 onClick={() => setShowPassword(!showPassword)}
                 className="feild !w-[14%] border flex justify-center !px-0 !rounded-tl-none !rounded-bl-none"
               >
-                {showPassword ? <FiEyeOff className="text-[20px]" /> : <FiEye className="text-[20px]" />}
+                {showPassword ? (
+                  <FiEyeOff className="text-[20px]" />
+                ) : (
+                  <FiEye className="text-[20px]" />
+                )}
               </button>
             </div>
           </div>
-          {error && <p className="text-red-500 text-sm flex items-center gap-[5px]"><MdErrorOutline />{error}</p>}
+          {error && (
+            <p className="text-red-500 text-sm flex items-center gap-[5px]">
+              <MdErrorOutline />
+              {error}
+            </p>
+          )}
 
-          <button type="submit" className="btn w-full">
+          <Button type="submit" className="btn w-full">
             Log In
-          </button>
+          </Button>
         </form>
       </div>
     </div>

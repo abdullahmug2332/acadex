@@ -5,15 +5,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { FaBell } from "react-icons/fa6";
+import { BsBell } from "react-icons/bs";
 export default function Notification() {
   return (
-    <div>
+    <div className='cursor-pointer'>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div className="relative">
               <span className="absolute top-0 -right-1 h-2 w-2 rounded-full bg ring-1 ring-white" />
-              <FaBell className="text-[20px] md:text-[25px]" />
+              <BsBell className="text-[20px] md:text-[25px]" />
             </div>
           </DropdownMenuTrigger>
 

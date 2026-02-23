@@ -8,7 +8,18 @@
   --secondary: #EBEEFD;
   --bigfont: 'Barlow', sans-serif;
   --smallfont: 'Inter', sans-serif;
+  --border: #EBEEFD;
   --radius: 0.625rem;
+
+  --sidebar: #EBEEFD;
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: lab(99.9994% .00113249 -.0418425);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: #EBEEFD;
+  --sidebar-ring: #EBEEFD;
+
   --background: oklch(1 0 0);
   --foreground: oklch(26.448% 0.00003 271.152);
   --card: oklch(1 0 0);
@@ -22,7 +33,6 @@
   --accent: oklch(100% 0.00011 271.152);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.646 0.222 41.116);
@@ -30,14 +40,7 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
 }
 
 @theme inline {
@@ -89,7 +92,7 @@ body {
   background-color: var(--primary) !important;
   color:white !important;
   font-family: var(--smallfont);
-  @apply px-[20px] py-[7px] rounded-[5px] font-[400] duration-300 cursor-pointer;
+  @apply sm:px-[20px] sm:py-[7px] rounded-[5px] font-[400] duration-300 cursor-pointer text-[12px] sm:text-[14px];
 
 }
 
@@ -198,3 +201,9 @@ input[type="search"]::-webkit-search-cancel-button {
   appearance: none;
   display: none;
 }
+input,.input{
+    @apply focus-visible:ring-0  w-full bg-background px-3 py-2 text-sm placeholder:text-muted-foreground
+         rounded-md border border-primary/30  
+         focus-visible:outline-primary/30 ;
+}
+

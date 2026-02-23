@@ -1,12 +1,10 @@
-// app/api/check-auth/route.ts
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getUserFromRequest } from "@/lib/auth";
 
-export async function GET(req: any) {
-  const cookie = req.cookies.get("token"); // replace "token" with your cookie name
+export async function GET(req: NextRequest) {
+  const user = await getUserFromRequest(req);
 
-  if (cookie) {
-    return NextResponse.json({ authenticated: true });
-  } else {
-    return NextResponse.json({ authenticated: false });
-  }
+  return NextResponse.json({
+    authenticated: !!user,
+  });
 }
