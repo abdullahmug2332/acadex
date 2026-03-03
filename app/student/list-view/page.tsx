@@ -48,6 +48,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Eye, Pencil, Trash2 } from "lucide-react";
+import Link from "next/link";
 const students = [
   {
     id: "1",
@@ -210,10 +211,12 @@ export default function Students() {
             Filter
           </Button>
 
-          <Button className="gap-2 bg hbg btn">
-            <Plus className="w-4 h-4" />
-            Add Student
-          </Button>
+          <Link href={"/student/create-student"}>
+            <Button className="gap-2 bg hbg btn">
+              <Plus className="w-4 h-4" />
+              Add Student
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -274,41 +277,41 @@ export default function Students() {
       </div>
 
       <div className="w-full overflow-x-auto ">
-          {viewMode === "card" ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {viewMode === "card" ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {students.map((student) => (
+              <StudentCard key={student.id} {...student} />
+            ))}
+          </div>
+        ) : (
+          <Table className="mSTD-w-full! ">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Photo</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Student ID</TableHead>
+                <TableHead>Grade</TableHead>
+                <TableHead>Section</TableHead>
+                <TableHead>Enrollment Date</TableHead>
+                <TableHead>Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {students.map((student) => (
-                <StudentCard key={student.id} {...student} />
-              ))}
-            </div>
-          ) : (
-            <Table className="mSTD-w-full! ">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Photo</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Student ID</TableHead>
-                  <TableHead>Grade</TableHead>
-                  <TableHead>Section</TableHead>
-                  <TableHead>Enrollment Date</TableHead>
-                  <TableHead>Action</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {students.map((student) => (
-                  <TableRow key={student.id}>
-                    <TableCell>
-                      <img
-                        src={student.image}
-                        alt={student.name}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                    </TableCell>
-                    <TableCell>{student.name}</TableCell>
-                    <TableCell>{student.studentId}</TableCell>
-                    <TableCell>{student.grade}</TableCell>
-                    <TableCell>{student.section}</TableCell>
-                    <TableCell>{student.enrollmentDate}</TableCell>
-                    <TableCell>
+                <TableRow key={student.id}>
+                  <TableCell>
+                    <img
+                      src={student.image}
+                      alt={student.name}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  </TableCell>
+                  <TableCell>{student.name}</TableCell>
+                  <TableCell>{student.studentId}</TableCell>
+                  <TableCell>{student.grade}</TableCell>
+                  <TableCell>{student.section}</TableCell>
+                  <TableCell>{student.enrollmentDate}</TableCell>
+                  <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
@@ -338,12 +341,11 @@ export default function Students() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            
-          )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
       {/* Pagination */}
       <Pagination>

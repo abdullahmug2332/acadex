@@ -1,30 +1,16 @@
+import { Building2, CalendarDays, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SlCalender } from "react-icons/sl";
-import { MoreVertical } from "lucide-react";
+import { MoreVertical, Eye, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Eye, Pencil, Trash2 } from "lucide-react";
-import { BookOpen, Building2, CalendarDays } from "lucide-react";
-import { Teacher } from "@/types/Teachers";
-import { format, parseISO } from "date-fns";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { DialogTrigger } from "@radix-ui/react-dialog";
-import axios from "axios";
-import { toast } from "sonner";
-import TeacherModal from "./TeacherModal";
 import { useState } from "react";
-import { deactivateTeacher } from "@/lib/api/teacher";
+import StaffModal from "./StaffModal";
+import { format, parseISO } from "date-fns";
+import { PiRecycleLight } from "react-icons/pi";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -36,22 +22,32 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import Link from "next/link";
 
-interface TeacherCardProps extends Teacher {
-  handleDeactivate: (id: number) => void;
+interface TrashStaffCardProps {
+  id: number;
+  first_name: string;
+  last_name: string;
+  uid: string;
+  role: string;
+  department: string;
+  hired_date: string;
+  image: string;
+  handleRestoreStaff: (id: number) => void;
+  handlePermanentDelete: (id: number) => void;
 }
 
-export function TeacherCard({
+export function TrashStaffCard({
   id,
   first_name,
   last_name,
   uid,
+  role,
   department,
   hired_date,
   image,
-  handleDeactivate,
-}: TeacherCardProps) {
+  handleRestoreStaff,
+  handlePermanentDelete,
+}: TrashStaffCardProps) {
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
@@ -80,7 +76,7 @@ export function TeacherCard({
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end" className="w-40">
-            {/* View button - just triggers modal */}
+            {/* View */}
             <DropdownMenuItem
               onClick={() => setModalOpen(true)}
               className="flex items-center gap-2 cursor-pointer"
@@ -88,41 +84,42 @@ export function TeacherCard({
               <Eye className="w-4 h-4 text-primary" /> View
             </DropdownMenuItem>
 
-            <Link href={`/teacher/edit-teacher/${id}`}>
-              <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
-                <Pencil className="w-4 h-4 text-primary" />
-                Edit
-              </DropdownMenuItem>
-            </Link>
+            {/* Restore */}
+            <DropdownMenuItem
+              className="flex items-center gap-2 cursor-pointer"
+              onClick={() => handleRestoreStaff(id)}
+            >
+              <PiRecycleLight className="w-4 h-4 text-primary" /> Restore
+            </DropdownMenuItem>
 
+            {/* Permanent Delete */}
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <DropdownMenuItem
-                  className="flex items-center gap-2 text-red-600 focus:text-red-600 cursor-pointer"
+                  className="flex items-center gap-2 text-red-600 hover:text-red-600! cursor-pointer"
                   onSelect={(e) => e.preventDefault()}
                 >
-                  <Trash2 className="w-4 h-4 text-red-600" />
-                  Trash
+                  <Trash2 className="w-4 h-4 text-red-600 hover:text-red-600!" />
+                  Permanent Delete
                 </DropdownMenuItem>
               </AlertDialogTrigger>
 
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogTitle>Delete Permanently?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action will move this teacher to trash. You can restore
-                    it later if needed.
+                    This action cannot be undone. This will permanently delete
+                    this staff member from the database.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
 
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-
                   <AlertDialogAction
-                    onClick={() => handleDeactivate(id)}
-                    className="bg-red-600 hover:bg-red-700"
+                    onClick={() => handlePermanentDelete(id)}
+                    className="bg-red-600 hover:bg-red-700!"
                   >
-                    Yes, Trash
+                    Permanent Delete
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -134,10 +131,19 @@ export function TeacherCard({
       {/* Info sections */}
       <div className="space-y-3 text-sm">
         <div className="grid grid-cols-2 gap-4">
+          {/* Role */}
+          <div className="col-span-2">
+            <p className="text-gray-600 mb-1">Role</p>
+            <p className="font-medium flex items-center gap-2">
+              <BadgeCheck className="text-primary size-5" />
+              {role}
+            </p>
+          </div>
+
           {/* Department */}
           <div>
             <p className="text-gray-600 mb-1">Department</p>
-            <p className="font-medium text-gray-900 flex gap-1 items-center">
+            <p className="font-medium flex items-center gap-2">
               <Building2 className="text-primary size-5" />
               {department}
             </p>
@@ -146,16 +152,16 @@ export function TeacherCard({
           {/* Hired Date */}
           <div>
             <p className="text-gray-600 mb-1">Hired Date</p>
-            <p className="font-medium text-gray-900 flex gap-1 items-center">
+            <p className="font-medium flex items-center gap-2">
               <CalendarDays className="text-primary size-5" />
-              {hired_date ? format(parseISO(hired_date), "MM/dd/yy") : "-"}
+              {hired_date ? format(parseISO(hired_date), "MM/dd/yyyy") : "-"}
             </p>
           </div>
-
         </div>
       </div>
-      {/* Modal outside DropdownMenu */}
-      <TeacherModal
+
+      {/* Staff Modal */}
+      <StaffModal
         id={id.toString()}
         open={modalOpen}
         onOpenChange={setModalOpen}

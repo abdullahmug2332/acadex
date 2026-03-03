@@ -2,11 +2,13 @@
 import { useEffect, useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import { MdErrorOutline } from "react-icons/md";
 import { useAppDispatch } from "@/store/hooks";
 import { setUser, clearUser } from "@/store/userSlice";
 import { Button } from "@/components/ui/button";
+import { checkAuth, loginUser } from "@/lib/auth";
+import { toast } from "sonner";
+
 export default function Auth() {
   const dispatch = useAppDispatch();
   const [email, setEmail] = useState("");
@@ -17,25 +19,21 @@ export default function Auth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const verifyAuth = async () => {
       try {
-        const res = await axios.get("/api/check-auth");
-        if (res.data.authenticated) {
-          console.log("auhenticated");
-          router.replace("/"); 
-          console.log("route pushed");
+        const data = await checkAuth();
 
+        if (data.authenticated) {
+          router.replace("/");
         } else {
-          console.log("not authenticated");
-
-          setLoading(false); 
+          setLoading(false);
         }
-      } catch (err) {
-        console.log("catch");
+      } catch (error) {
         setLoading(false);
       }
     };
-    checkAuth();
+
+    verifyAuth();
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,21 +41,15 @@ export default function Auth() {
     setError("");
 
     try {
-      const res = await axios.post("/api/login", { email, password });
-
-      const user = res.data.user;
-
-      dispatch(setUser(user));
-
+      const data = await loginUser(email, password);
+      dispatch(setUser(data.user));
+      toast.success("User Login successfully!");
       router.push("/");
+      
     } catch (err: any) {
       dispatch(clearUser());
 
-      if (err.response?.data?.error) {
-        setError(err.response.data.error);
-      } else {
-        setError("Something went wrong");
-      }
+      setError(err.response?.data?.error || "Something went wrong");
     }
   };
   if (loading) return <p>Loadingg...</p>;

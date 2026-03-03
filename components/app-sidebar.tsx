@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   AudioWaveform,
   BookOpen,
@@ -12,9 +12,9 @@ import {
   PieChart,
   Settings2,
   SquareTerminal,
-} from "lucide-react"
+} from "lucide-react";
 
-import { NavMain } from "@/components/nav-main"
+import { NavMain } from "@/components/nav-main";
 import { PiStudentLight } from "react-icons/pi";
 import { GraduationCap, User, Users } from "lucide-react";
 import { AiOutlineUser } from "react-icons/ai";
@@ -26,13 +26,12 @@ import {
   SidebarHeader,
   SidebarRail,
   SidebarTrigger,
-  useSidebar,
-} from "@/components/ui/sidebar"
-import Image from "next/image"
-
+} from "@/components/ui/sidebar";
+import Image from "next/image";
+import Link from "next/link";
+import { useSidebar } from "@/components/ui/sidebar";
 // This is sample data.
 const data = {
-  
   navMain: [
     {
       title: "Students",
@@ -41,7 +40,7 @@ const data = {
       items: [
         {
           title: "List View",
-          url: "/student/view-list",
+          url: "/student/list-view",
         },
         {
           title: "Create Student",
@@ -56,11 +55,15 @@ const data = {
       items: [
         {
           title: "List View",
-          url: "/teacher/view-list",
+          url: "/teacher/list-view",
         },
         {
           title: "Create Teacher",
           url: "/teacher/create-teacher",
+        },
+        {
+          title: "Trash",
+          url: "/teacher/trash",
         },
       ],
     },
@@ -72,17 +75,18 @@ const data = {
       items: [
         {
           title: "List View",
-          url: "/staff/view-list",
+          url: "/staff/list-view",
         },
         {
           title: "Create Staff",
           url: "/staff/create-staff",
         },
-        
+        {
+          title: "Trash",
+          url: "/staff/trash",
+        },
       ],
     },
-    
-    
   ],
   projects: [
     {
@@ -95,31 +99,34 @@ const data = {
       url: "#",
       icon: PieChart,
     },
-    
   ],
-}
+};
+
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { open } = useSidebar();
+  const { open, openMobile } = useSidebar();
+const isSidebarOpen = open || openMobile;
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader className="">
-        {open ? (
-          <div className="flex justify-between">
-          <Image
-            src="/logo3.png"
-            alt="Logo"
-            width={200}
-            height={200}
-            className="w-[70%] object-contain"
-            unoptimized
-          />
-          <SidebarTrigger className="text-[10px] block md:hidden" />
+      <SidebarHeader>
+      <Link href={"/"}>
+        {isSidebarOpen ? (
+          <div className="flex justify-between items-center">
+            <Image
+              src="/logo3.png"
+              alt="Logo"
+              width={200}
+              height={200}
+              className="w-[70%] object-contain"
+              loading="eager"
+              unoptimized
+            />
+            <SidebarTrigger className="text-[10px] block md:hidden" />
           </div>
         ) : (
-          // Collapsed → Icon only
-           <Image
+          <Image
             src="/logo2.png"
+            loading="eager"
             alt="Logo"
             width={200}
             height={200}
@@ -127,15 +134,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             unoptimized
           />
         )}
+        </Link>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
         {/* <NavProjects projects={data.projects}  */}
       </SidebarContent>
-      <SidebarFooter>
-        {/* <NavUser user={data.user} /> */}
-      </SidebarFooter>
+      <SidebarFooter>{/* <NavUser user={data.user} /> */}</SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

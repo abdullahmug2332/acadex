@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { SlCalender } from "react-icons/sl";
 import { MoreVertical } from "lucide-react";
 import {
   DropdownMenu,
@@ -25,6 +24,7 @@ import { toast } from "sonner";
 import TeacherModal from "./TeacherModal";
 import { useState } from "react";
 import { deactivateTeacher } from "@/lib/api/teacher";
+import { PiRecycleLight } from "react-icons/pi";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -36,22 +36,28 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import Link from "next/link";
 
-interface TeacherCardProps extends Teacher {
-  handleDeactivate: (id: number) => void;
+interface TrashTeacherCardProps extends Teacher {
+  handleRestoreTeacher: (id: number) => void;
+  handleParmanentDelete: (id: number) => void;
+  page:string;
 }
 
-export function TeacherCard({
+export function TrashTeacherCard({
   id,
   first_name,
   last_name,
+  email,
   uid,
+  phone,
+  gender,
   department,
   hired_date,
   image,
-  handleDeactivate,
-}: TeacherCardProps) {
+  subject_id,
+  handleRestoreTeacher,
+  handleParmanentDelete,
+}: TrashTeacherCardProps) {
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
@@ -80,38 +86,42 @@ export function TeacherCard({
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end" className="w-40">
-            {/* View button - just triggers modal */}
             <DropdownMenuItem
-              onClick={() => setModalOpen(true)}
+              onClick={() => {
+                setModalOpen(true);
+              }}
               className="flex items-center gap-2 cursor-pointer"
             >
               <Eye className="w-4 h-4 text-primary" /> View
             </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer flex items-center gap-2"
+              onClick={() => handleRestoreTeacher(id)}
+            >
+              <PiRecycleLight className="w-4 h-4 text-primary" />
+              Restore
+            </DropdownMenuItem>
 
-            <Link href={`/teacher/edit-teacher/${id}`}>
-              <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
-                <Pencil className="w-4 h-4 text-primary" />
-                Edit
-              </DropdownMenuItem>
-            </Link>
+          
+
 
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <DropdownMenuItem
-                  className="flex items-center gap-2 text-red-600 focus:text-red-600 cursor-pointer"
+                  className="cursor-pointer flex items-center gap-2 text-red-600 focus:text-red-600"
                   onSelect={(e) => e.preventDefault()}
                 >
                   <Trash2 className="w-4 h-4 text-red-600" />
-                  Trash
+                  Permanent Delete
                 </DropdownMenuItem>
               </AlertDialogTrigger>
 
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogTitle>Delete Permanently?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action will move this teacher to trash. You can restore
-                    it later if needed.
+                    This action cannot be undone. This will permanently delete
+                    this teacher from the database.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
 
@@ -119,10 +129,10 @@ export function TeacherCard({
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
 
                   <AlertDialogAction
-                    onClick={() => handleDeactivate(id)}
+                    onClick={() => handleParmanentDelete(id)}
                     className="bg-red-600 hover:bg-red-700"
                   >
-                    Yes, Trash
+                    Permanent Delete
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -151,7 +161,6 @@ export function TeacherCard({
               {hired_date ? format(parseISO(hired_date), "MM/dd/yy") : "-"}
             </p>
           </div>
-
         </div>
       </div>
       {/* Modal outside DropdownMenu */}

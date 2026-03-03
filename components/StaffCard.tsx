@@ -7,41 +7,66 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useState } from "react";
+import StaffModal from "./StaffModal";
+import { format, parseISO } from "date-fns";
+import Link from "next/link";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 interface StaffCardProps {
-  name: string;
-  staffId: string;
+  id: number;
+  first_name: string;
+  last_name: string;
+  uid: string;
   role: string;
   department: string;
-  hireDate: string;
+  hired_date: string;
   image: string;
+  handleDeactivate: (id: number) => void; // ✅ function to trash staff
 }
 
 export function StaffCard({
-  name,
-  staffId,
+  id,
+  first_name,
+  last_name,
+  uid,
   role,
   department,
-  hireDate,
+  hired_date,
   image,
+  handleDeactivate,
 }: StaffCardProps) {
+  const [modalOpen, setModalOpen] = useState(false);
+
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-      
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <img
-            src={image}
-            alt={name}
+            src={image || "/placeholder.svg"}
+            alt={`${first_name} ${last_name}`}
             className="w-12 h-12 rounded-full object-cover"
           />
           <div>
-            <h3 className="font-semibold text-gray-900">{name}</h3>
-            <p className="text-sm text-gray-600">{staffId}</p>
+            <h3 className="font-semibold text-gray-900">
+              {first_name} {last_name}
+            </h3>
+            <p className="text-sm text-gray-600">{uid}</p>
           </div>
         </div>
 
+        {/* Dropdown Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -49,24 +74,59 @@ export function StaffCard({
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              <Eye className="w-4 h-4 mr-2" />
-              View
+          <DropdownMenuContent align="end" className="w-40">
+            {/* View */}
+            <DropdownMenuItem
+              onClick={() => setModalOpen(true)}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <Eye className="w-4 h-4 text-primary" /> View
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Pencil className="w-4 h-4 mr-2" />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600">
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete
-            </DropdownMenuItem>
+
+            {/* Edit */}
+            <Link href={`/staff/edit-staff/${id}`}>
+              <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
+                <Pencil className="w-4 h-4 text-primary" />
+                Edit
+              </DropdownMenuItem>
+            </Link>
+
+            {/* Trash */}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem
+                  className="flex items-center gap-2 text-red-600 hover:text-red-700! cursor-pointer"
+                  onSelect={(e) => e.preventDefault()}
+                >
+                  <Trash2 className="w-4 h-4 text-red-600 hover:text-red-700!" />
+                  Trash
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Move to Trash?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action will move this staff member to trash. You can
+                    restore it later if needed.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => handleDeactivate(id)}
+                    className="bg-red-600 hover:bg-red-700!"
+                  >
+                    Yes, Trash
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
-      {/* Info */}
+      {/* Info Section */}
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div className="col-span-2">
           <p className="text-gray-600 mb-1">Role</p>
@@ -88,10 +148,17 @@ export function StaffCard({
           <p className="text-gray-600 mb-1">Hired Date</p>
           <p className="font-medium flex items-center gap-2">
             <CalendarDays className="text-primary size-5" />
-            {hireDate}
+            {hired_date ? format(parseISO(hired_date), "MM/dd/yyyy") : "-"}
           </p>
         </div>
       </div>
+
+      {/* Staff Modal */}
+      <StaffModal
+        id={id.toString()}
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+      />
     </div>
   );
 }

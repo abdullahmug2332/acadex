@@ -1,31 +1,81 @@
 "use client";
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Heading from "@/components/Heading";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { createTeacher, TeacherForm } from "@/lib/api/teacher";
+import { editStaff, getStaffById } from "@/lib/api/staff";
+import { Staff, StaffForm } from "@/types/Staff";
 
-export default function AddTeacherPage() {
-  const [loading, setLoading] = useState(false);
+interface PageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
 
-  const [formData, setFormData] = useState<TeacherForm>({
+export default function Page({ params }: PageProps) {
+  const [paramId, setParamId] = useState<number>(0);
+
+  const [formData, setFormData] = useState<StaffForm>({
     first_name: "",
     last_name: "",
     email: "",
     cnic: "",
     phone: "",
     gender: "male",
-    date_of_birth: "",
+    date_of_birth: "", // ✅ added
     address: "",
     department: "",
-    qualification: "",
-    experience: "",
+    role: "",
+    qualification: "", // ✅ added
+    experience: "", // ✅ added
     hired_date: "",
-    subject_id: [],
   });
+
+  const [loading, setLoading] = useState(false);
+
+  // ✅ Fetch staff on load
+  useEffect(() => {
+    const fetchStaff = async () => {
+      try {
+        const resolvedParams = await params;
+        const numberId = Number(resolvedParams.id);
+
+        if (isNaN(numberId)) throw new Error("Invalid staff ID");
+
+        setParamId(numberId);
+
+        const staff: Staff = await getStaffById(numberId);
+
+        const formatDateForInput = (dateString?: string) => {
+          if (!dateString) return "";
+          console.log("dateString", dateString);
+          return dateString.slice(0, 10); // "YYYY-MM-DD"
+        };
+
+        setFormData({
+          first_name: staff.first_name || "",
+          last_name: staff.last_name || "",
+          email: staff.email || "",
+          cnic: staff.cnic || "",
+          phone: staff.phone || "",
+          gender: staff.gender || "male",
+          date_of_birth: formatDateForInput(staff.date_of_birth ?? undefined), // ✅
+          address: staff.address || "",
+          department: staff.department || "",
+          role: staff.role || "",
+          qualification: staff.qualification || "", // ✅
+          experience: staff.experience?.toString() || "", // ✅
+          hired_date: formatDateForInput(staff.hired_date ?? undefined),
+        });
+      } catch (err: any) {
+        toast.error(`Error fetching staff: ${err.message}`);
+      }
+    };
+
+    fetchStaff();
+  }, [params]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -41,37 +91,22 @@ export default function AddTeacherPage() {
     setLoading(true);
 
     try {
-      await createTeacher(formData);
-      toast.success(`Teacher created successfully.`);
-      setFormData({
-        first_name: "",
-        last_name: "",
-        email: "",
-        cnic: "",
-        phone: "",
-        gender: "male",
-        date_of_birth: "",
-        address: "",
-        department: "",
-        qualification: "",
-        experience: "",
-        hired_date: "",
-        subject_id: [],
-      });
+      await editStaff(paramId, formData);
+      toast.success("Staff edited successfully.");
     } catch (err: any) {
-      toast.error(`Error ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className=" bg-background">
+    <div className="bg-background">
       <div>
         <div className="mb-6">
-          <Heading title="Create Teacher" />
+          <Heading title="Edit Staff" />
           <p className="mt-2 text-muted-foreground">
-            Fill in the form below to add a new teacher
+            Fill in the form below to edit staff
           </p>
         </div>
 
@@ -115,7 +150,7 @@ export default function AddTeacherPage() {
                 <Label>CNIC</Label>
                 <Input
                   name="cnic"
-                  placeholder="12345-1234567-1"
+                  placeholder="1234512345671"
                   value={formData.cnic}
                   onChange={handleChange}
                   required
@@ -127,6 +162,16 @@ export default function AddTeacherPage() {
                 <Input
                   name="phone"
                   value={formData.phone}
+                  onChange={handleChange}
+                />
+              </div>
+              
+              <div>
+                <Label>Date of Birth</Label>
+                <Input
+                  type="date"
+                  name="date_of_birth"
+                  value={formData.date_of_birth}
                   onChange={handleChange}
                 />
               </div>
@@ -146,16 +191,6 @@ export default function AddTeacherPage() {
                 </select>
               </div>
 
-              <div>
-                <Label>Date of Birth</Label>
-                <Input
-                  type="date"
-                  name="date_of_birth"
-                  value={formData.date_of_birth}
-                  onChange={handleChange}
-                />
-              </div>
-
               <div className="sm:col-span-2">
                 <Label>Address</Label>
                 <Input
@@ -172,12 +207,23 @@ export default function AddTeacherPage() {
             <h2 className="mb-4 text-lg font-semibold">
               Professional Information
             </h2>
+
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label>Department</Label>
                 <Input
                   name="department"
                   value={formData.department}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label>Role</Label>
+                <Input
+                  name="role"
+                  value={formData.role}
                   onChange={handleChange}
                   required
                 />
@@ -213,21 +259,11 @@ export default function AddTeacherPage() {
                   required
                 />
               </div>
-
-              <div className="sm:col-span-2">
-                <Label>Subjects (comma-separated)</Label>
-                <Input
-                  name="subject_id"
-                  placeholder="Math, Physics"
-                  value={formData.subject_id}
-                  onChange={handleChange}
-                />
-              </div>
             </div>
           </div>
 
           <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Adding..." : "Add Teacher"}
+            {loading ? "Saving..." : "Save Changes"}
           </Button>
         </form>
       </div>

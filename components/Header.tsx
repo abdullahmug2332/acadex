@@ -6,7 +6,7 @@ import { TfiAlignLeft } from "react-icons/tfi";
 import { SidebarTrigger } from "./ui/sidebar";
 export default function Header() {
   return (
-    <div className="sticky top-0 right-0   py-[10px] px-[10px] md:px-[20px]  shadow-b text-center bg2 flex justify-between items-center z-[9] ">
+    <div className="fixed md:sticky top-0 right-0 py-[10px] px-[10px] md:px-[20px] bg-white shadow-b text-center border-b flex justify-between items-center z-[9] w-full">
       <SidebarTrigger>
         <TfiAlignLeft
           className={` duration-500 text-[20px] lg:text-[25px]  hover:cursor-pointer text-[var(--foreground)]`}

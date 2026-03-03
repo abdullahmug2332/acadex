@@ -1,16 +1,25 @@
 "use client";
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Heading from "@/components/Heading";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { createTeacher, TeacherForm } from "@/lib/api/teacher";
+import {
+  editTeacher,
+  getTeacherById,
+} from "@/lib/api/teacher";
+import {  Teacher,
+  TeacherForm } from "@/types/Teachers"
 
-export default function AddTeacherPage() {
-  const [loading, setLoading] = useState(false);
+interface PageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
 
+export default function Page({ params }: PageProps) {
+  const [paramId, setParamId] = useState<number>(0);
   const [formData, setFormData] = useState<TeacherForm>({
     first_name: "",
     last_name: "",
@@ -26,13 +35,61 @@ export default function AddTeacherPage() {
     hired_date: "",
     subject_id: [],
   });
+  const [loading, setLoading] = useState(false);
+
+  // Fetch teacher data on first load
+  useEffect(() => {
+    const fetchTeacher = async () => {
+      try {
+        // params is a promise, so await it
+        const resolvedParams = await params;
+        const numberId = Number(resolvedParams.id); // convert to number
+
+        if (isNaN(numberId)) throw new Error("Invalid teacher ID");
+
+        setParamId(numberId);
+
+        const teacher: Teacher = await getTeacherById(numberId);
+        console.log("teacher", teacher);
+
+        const formatDateForInput = (dateString?: string) => {
+          if (!dateString) return "";
+          console.log("dateString", dateString);
+          return dateString.slice(0, 10); // "YYYY-MM-DD"
+        };
+
+        setFormData({
+          first_name: teacher.first_name || "",
+          last_name: teacher.last_name || "",
+          email: teacher.email || "",
+          cnic: teacher.cnic || "",
+          phone: teacher.phone || "",
+          gender: teacher.gender || "male",
+          date_of_birth: formatDateForInput(teacher.date_of_birth),
+          address: teacher.address || "",
+          department: teacher.department || "",
+          qualification: teacher.qualification || "",
+          experience: teacher.experience?.toString() || "",
+          hired_date: formatDateForInput(teacher.hired_date),
+          subject_id: teacher.subject_id || [],
+        });
+      } catch (err: any) {
+        toast.error(`Error fetching teacher: ${err.message}`);
+      }
+    };
+
+    fetchTeacher();
+  }, [params]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]:
+        e.target.name === "subject_id"
+          ? e.target.value.split(",").map((s) => s.trim())
+          : e.target.value,
     });
   };
 
@@ -41,25 +98,10 @@ export default function AddTeacherPage() {
     setLoading(true);
 
     try {
-      await createTeacher(formData);
-      toast.success(`Teacher created successfully.`);
-      setFormData({
-        first_name: "",
-        last_name: "",
-        email: "",
-        cnic: "",
-        phone: "",
-        gender: "male",
-        date_of_birth: "",
-        address: "",
-        department: "",
-        qualification: "",
-        experience: "",
-        hired_date: "",
-        subject_id: [],
-      });
+      await editTeacher(paramId, formData);
+      toast.success(`Teacher edited successfully.`);
     } catch (err: any) {
-      toast.error(`Error ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -69,9 +111,9 @@ export default function AddTeacherPage() {
     <div className=" bg-background">
       <div>
         <div className="mb-6">
-          <Heading title="Create Teacher" />
+          <Heading title="Edit Teacher" />
           <p className="mt-2 text-muted-foreground">
-            Fill in the form below to add a new teacher
+            Fill in the form below to edit teacher
           </p>
         </div>
 
@@ -110,12 +152,11 @@ export default function AddTeacherPage() {
                   required
                 />
               </div>
-
               <div>
                 <Label>CNIC</Label>
                 <Input
                   name="cnic"
-                  placeholder="12345-1234567-1"
+                  placeholder="1234512345671"
                   value={formData.cnic}
                   onChange={handleChange}
                   required
@@ -219,7 +260,7 @@ export default function AddTeacherPage() {
                 <Input
                   name="subject_id"
                   placeholder="Math, Physics"
-                  value={formData.subject_id}
+                  value={formData.subject_id.join(", ")}
                   onChange={handleChange}
                 />
               </div>
@@ -227,7 +268,7 @@ export default function AddTeacherPage() {
           </div>
 
           <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Adding..." : "Add Teacher"}
+            {loading ? "Saving..." : "Save Changes"}
           </Button>
         </form>
       </div>

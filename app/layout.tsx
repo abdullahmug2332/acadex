@@ -15,13 +15,13 @@ import { usePathname } from "next/navigation";
 
 const barlow = Barlow({
   subsets: ["latin"],
-  weight: ["100","200","300","400","500","600","700","800","900"],
-  style: ["normal","italic"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  style: ["normal", "italic"],
 });
 
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["300","400","500","600","700"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-inter",
 });
 
@@ -44,32 +44,29 @@ export default function RootLayout({
       <body className={`${barlow.className} ${inter.variable} antialiased`}>
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
-            
             {isAuthRoute ? (
               // Render children directly for auth routes
               <>{children}</>
             ) : (
-              // Render full layout for other routes
-              <div className="flex max-w-[100vw]! ">
+              <div className="flex h-screen bg2 md:pr-2">
                 <SidebarProvider>
                   <AppSidebar />
-
-                  <main className="flex-1 bg-secondary">
+                  <main className="flex-1 md:pt-2 h-screen ">
                     <TooltipProvider>
-                      <div className="flex flex-col min-h-screen max-w-[100vw]">
+                      {/* Rounded Card Wrapper */}
+                      <div className="flex flex-col h-full bg-white md:rounded-t-2xl shadow-xl overflow-hidden max-w-[100vw] py-15 md:py-0">
                         <Header />
-                        <div className="md:rounded-t-[20px]  p-6 bg-white grow">
+                        {/* ONLY this scrolls */}
+                        <div className="flex-1 overflow-y-auto p-6 custom-scroll">
                           {children}
                         </div>
                       </div>
-
                       <Toaster position="bottom-right" richColors />
                     </TooltipProvider>
                   </main>
                 </SidebarProvider>
               </div>
             )}
-
           </PersistGate>
         </Provider>
       </body>

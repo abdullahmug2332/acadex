@@ -1,135 +1,246 @@
 "use client";
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Heading from "@/components/Heading";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { createStaff } from "@/lib/api/staff";
+import { StaffForm } from "@/types/Staff";
 
-export default function AddStaffPage() {
-  const [submitted, setSubmitted] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string>("");
+export default function Page() {
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [formData, setFormData] = useState<StaffForm>({
+    first_name: "",
+    last_name: "",
+    email: "",
+    cnic: "",
+    phone: "",
+    gender: "male",
+    date_of_birth: "",
+    address: "",
+    department: "",
+    role: "",
+    qualification: "",
+    experience: "",
+    hired_date: "",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const staffData = Object.fromEntries(formData.entries());
-    console.log("Staff Data:", staffData);
-    setSubmitted(true);
+    setLoading(true);
 
-    setTimeout(() => {
-      setSubmitted(false);
-      e.currentTarget.reset();
-      setPreviewUrl("");
-    }, 2000);
+    try {
+      await createStaff({
+        ...formData,
+        experience: (formData.experience), // ✅ convert to number
+      });
+
+      toast.success("Staff created successfully!");
+
+      // Reset form
+      setFormData({
+        first_name: "",
+        last_name: "",
+        email: "",
+        cnic: "",
+        phone: "",
+        gender: "male",
+        date_of_birth: "",
+        address: "",
+        department: "",
+        role: "",
+        qualification: "",
+        experience: "",
+        hired_date: "",
+      });
+    } catch (err: any) {
+      toast.error(`Error: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       <div>
         <div className="mb-6">
           <Heading title="Create Staff" />
           <p className="mt-2 text-muted-foreground">
-            Fill in the form below to add a new staff member
+            Fill in the form below to create new staff
           </p>
         </div>
 
-        {submitted && (
-          <div className="mb-6 rounded-lg bg-green-50 p-4">
-            <p className="text-sm font-medium text-green-800">
-              ✓ Staff added successfully!
-            </p>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-8 rounded-lg bg-card">
+        <form onSubmit={handleSubmit} className="space-y-8 bg-card rounded-lg">
+          
           {/* PERSONAL INFO */}
           <div>
             <h2 className="mb-4 text-lg font-semibold">Personal Information</h2>
             <div className="grid gap-4 sm:grid-cols-2">
+
+              <div>
+                <Label>First Name</Label>
+                <Input
+                  name="first_name"
+                  value={formData.first_name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label>Last Name</Label>
+                <Input
+                  name="last_name"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label>Email</Label>
+                <Input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label>CNIC</Label>
+                <Input
+                  name="cnic"
+                  value={formData.cnic}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label>Phone</Label>
+                <Input
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <Label>Date of Birth</Label>
+                <Input
+                  type="date"
+                  name="date_of_birth"
+                  value={formData.date_of_birth}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <Label>Gender</Label>
+                <select
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleChange}
+                  className="w-full border rounded-md px-3 py-1.5 border-primary/30"
+                >
+                  <option value="">Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
               <div className="sm:col-span-2">
-                <Label htmlFor="staffImage">Staff Image</Label>
-                <div className="border-2 border-dotted border-primary py-1 rounded-md text-primary cursor-pointer md:w-1/2 lg:w-1/4">
-                  <Input
-                    id="staffImage"
-                    name="staffImage"
-                    type="file"
-                    accept="image/*"
-                    className="border-0! shadow-none! cursor-pointer"
-                    onChange={(e) =>
-                      setPreviewUrl(
-                        e.target.files?.[0]
-                          ? URL.createObjectURL(e.target.files[0])
-                          : "",
-                      )
-                    }
-                  />
-                </div>
-
-                {previewUrl && (
-                  <img
-                    src={previewUrl}
-                    className="w-24 h-24 rounded mt-2 border"
-                  />
-                )}
+                <Label>Address</Label>
+                <Input
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                />
               </div>
 
-              <div>
-                <Label htmlFor="firstName">First Name</Label>
-                <Input id="firstName" name="firstName" required />
-              </div>
-
-              <div>
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input id="lastName" name="lastName" required />
-              </div>
-
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" type="email" required />
-              </div>
-
-              <div>
-                <Label htmlFor="phone">Phone</Label>
-                <Input id="phone" name="phone" type="tel" required />
-              </div>
             </div>
           </div>
 
-          {/* WORK INFO */}
+          {/* PROFESSIONAL INFO */}
           <div>
-            <h2 className="mb-4 text-lg font-semibold">Work Information</h2>
+            <h2 className="mb-4 text-lg font-semibold">
+              Professional Information
+            </h2>
+
             <div className="grid gap-4 sm:grid-cols-2">
+
               <div>
-                <Label htmlFor="role">Role</Label>
-                <Input id="role" name="role" required />
+                <Label>Department</Label>
+                <Input
+                  name="department"
+                  value={formData.department}
+                  onChange={handleChange}
+                  required
+                />
               </div>
 
               <div>
-                <Label htmlFor="department">Department</Label>
-                <Input id="department" name="department" required />
+                <Label>Role</Label>
+                <Input
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  required
+                />
               </div>
 
               <div>
-                <Label htmlFor="hireDate">Hire Date</Label>
-                <Input id="hireDate" name="hireDate" type="date" required />
+                <Label>Qualification</Label>
+                <Input
+                  name="qualification"
+                  value={formData.qualification}
+                  onChange={handleChange}
+                  required
+                />
               </div>
 
               <div>
-                <Label htmlFor="employmentType">Employment Type</Label>
-                <Input id="employmentType" name="employmentType" />
+                <Label>Experience (years)</Label>
+                <Input
+                  type="number"
+                  name="experience"
+                  value={formData.experience}
+                  onChange={handleChange}
+                />
               </div>
+
+              <div>
+                <Label>Hired Date</Label>
+                <Input
+                  type="date"
+                  name="hired_date"
+                  value={formData.hired_date}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
             </div>
           </div>
 
-          <div className="flex gap-3">
-            <Button type="submit" className="flex-1">
-              Add Staff
-            </Button>
-            <Button type="reset" variant="outline">
-              Clear Form
-            </Button>
-          </div>
+          <Button type="submit" disabled={loading} className="w-full">
+            {loading ? "Creating..." : "Create Staff"}
+          </Button>
+
         </form>
       </div>
     </div>
