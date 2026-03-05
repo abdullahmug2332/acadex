@@ -2,20 +2,12 @@
 
 import * as React from "react";
 import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
   Frame,
-  GalleryVerticalEnd,
-  Map,
   PieChart,
-  Settings2,
-  SquareTerminal,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
-import { PiStudentLight } from "react-icons/pi";
+import { ImBooks } from "react-icons/im";
 import { GraduationCap, User, Users } from "lucide-react";
 import { Building2 } from "lucide-react";
 import {
@@ -104,6 +96,26 @@ const data = {
         {
           title: "Trash",
           url: "/departments/trash",
+        },
+      ],
+    },
+    {
+      title: "Subjects",
+      url: "#",
+      icon: ImBooks,
+      isActive: true,
+      items: [
+        {
+          title: "List View",
+          url: "/subjects/list-view",
+        },
+        {
+          title: "Create Subject",
+          url: "/subjects/create-subject",
+        },
+        {
+          title: "Trash",
+          url: "/subjects/trash",
         },
       ],
     },

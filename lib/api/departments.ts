@@ -1,26 +1,35 @@
 import axios from "axios";
 import { Department } from "@/types/Departments";
 import { DepartmentForm } from "@/types/Departments"; 
+import { GetDepartmentsResponse } from "@/types/Departments"; 
 
 // ✅ Get all Departments with pagination, search, and status filter
+
+
+
+
+
 
 export const getDepartments = async (
   page: number = 1,
   limit: number = 10,
   search?: string,
-  status?: "active" | "inactive"
-): Promise<{ departments: Department[]; total: number }> => {
+  status?: "active" | "inactive",
+  basic: boolean = false
+): Promise<GetDepartmentsResponse> => {
   const res = await axios.get("/api/departments", {
     params: {
       page,
       limit,
       search,
       status,
+      basic, // send basic=true if you want the minimal list
     },
   });
+  const departments = res.data.departments ?? res.data.data;
+  const total = res.data.total;
 
-  const { data, total } = res.data; // backend returns "data" key
-  return { departments: data, total };
+  return { departments, total };
 };
 // ✅ Get single Department by ID
 export const getDepartmentById = async (id: number): Promise<Department> => {

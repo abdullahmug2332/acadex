@@ -9,7 +9,7 @@ import toggleReducer from "./toggleSlice";
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user"], // only user slice will persist
+  whitelist: ['auth', 'user'],
 };
 
 const rootReducer = combineReducers({

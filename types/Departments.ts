@@ -17,3 +17,7 @@ export interface DepartmentForm {
   description?: string;
   head_id: number | string;
 }
+export interface GetDepartmentsResponse {
+  departments: Department[];
+  total: number;
+}

@@ -45,16 +45,34 @@ export async function POST(req: NextRequest) {
 }
 
 
-// GET ALL DEPARTMENTS (Pagination + Search + Status)
+
+
+
+// GET ALL DEPARTMENTS (Pagination + Search + Status + Optional Basic List)
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
 
+    // Query parameters
     const page = Number(searchParams.get("page")) || 1;
     const limit = Number(searchParams.get("limit")) || 10;
     const search = searchParams.get("search") || "";
     const status = searchParams.get("status");
+    const basic = searchParams.get("basic") === "true"; // optional flag for minimal data
 
+    if (basic) {
+      // Basic list without pagination/search/status
+      const [departments]: any = await db.execute(
+        `SELECT id, name FROM departments WHERE status='active' ORDER BY name ASC`
+      );
+
+      return NextResponse.json({
+        departments,
+        total: departments.length,
+      });
+    }
+
+    // Pagination + Search + Status logic
     const offset = (page - 1) * limit;
 
     let baseQuery = "FROM departments WHERE 1=1";
@@ -72,12 +90,12 @@ export async function GET(req: NextRequest) {
 
     const [data]: any = await db.execute(
       `SELECT * ${baseQuery} ORDER BY id DESC LIMIT ? OFFSET ?`,
-      [...values, limit, offset],
+      [...values, limit, offset]
     );
 
     const [count]: any = await db.execute(
       `SELECT COUNT(*) as total ${baseQuery}`,
-      values,
+      values
     );
 
     return NextResponse.json({
@@ -87,9 +105,10 @@ export async function GET(req: NextRequest) {
       limit,
     });
   } catch (error) {
+    console.error("GET /departments error:", error);
     return NextResponse.json(
       { error: "Failed to fetch departments" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
