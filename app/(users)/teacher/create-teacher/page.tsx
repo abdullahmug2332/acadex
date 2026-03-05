@@ -6,7 +6,8 @@ import Heading from "@/components/Heading";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { createTeacher, TeacherForm } from "@/lib/api/teacher";
+import { createTeacher} from "@/lib/api/teacher";
+import { TeacherForm } from "@/types/Teachers";
 
 export default function AddTeacherPage() {
   const [loading, setLoading] = useState(false);

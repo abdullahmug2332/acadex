@@ -44,7 +44,7 @@ export default function TeacherModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-[90%] max-w-[80%] lg:max-w-[700px]!">
         <DialogHeader>
           <DialogTitle className=" text-primary ">Teacher Details</DialogTitle>
           <DialogDescription>{loading ? "Loading..." : ""}</DialogDescription>
@@ -53,7 +53,7 @@ export default function TeacherModal({
         {!loading && teacher && (
           <div className="space-y-4 mt-2">
             <Table className="w-full">
-              <TableBody>
+              <TableBody className="grid md:grid-cols-2">
                 <TableRow>
                   <TableCell className="font-medium ">UID</TableCell>
                   <TableCell>{teacher.uid}</TableCell>
@@ -76,7 +76,7 @@ export default function TeacherModal({
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-medium">Gender</TableCell>
-                  <TableCell>{teacher.gender}</TableCell>
+                  <TableCell className="capitalize">{teacher.gender}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-medium">Date of Birth</TableCell>
@@ -95,6 +95,10 @@ export default function TeacherModal({
                   <TableCell>{teacher.department || "-"}</TableCell>
                 </TableRow>
                 <TableRow>
+                  <TableCell className="font-medium">Subjects</TableCell>
+                  <TableCell>{teacher.subject_id?.join(", ") || "-"}</TableCell>
+                </TableRow>
+                <TableRow>
                   <TableCell className="font-medium">Qualification</TableCell>
                   <TableCell>{teacher.qualification || "-"}</TableCell>
                 </TableRow>
@@ -111,9 +115,18 @@ export default function TeacherModal({
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className="font-medium">Subjects</TableCell>
-                  <TableCell>{teacher.subject_id?.join(", ") || "-"}</TableCell>
+                  <TableCell className="font-medium">Created at</TableCell>
+                  <TableCell>
+                    {teacher.created_at
+                      ? format(parseISO(teacher.created_at), "MM/dd/yyyy")
+                      : "-"}
+                  </TableCell>
                 </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Status</TableCell>
+                  <TableCell className="capitalize">{teacher.status || "-"}</TableCell>
+                </TableRow>
+                
               </TableBody>
             </Table>
           </div>

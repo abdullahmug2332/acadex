@@ -156,7 +156,7 @@ export async function DELETE(
     // Soft delete / deactivate
     if (type === "deactivate") {
       await pool.execute("UPDATE staff SET status = ? WHERE id = ?", ["inactive", id]);
-      return NextResponse.json({ message: "Staff status changed to inactive" });
+      return NextResponse.json({ message: "Staff moved to trash successfully" });
     }
 
     // Hard delete

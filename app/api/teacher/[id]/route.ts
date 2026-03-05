@@ -202,7 +202,7 @@ export async function DELETE(
       ]);
 
       return NextResponse.json({
-        message: "Teacher status changed to inactive",
+        message: "Teacher moved to trash successfully",
       });
     }
 

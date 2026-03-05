@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Heading from "@/components/Heading";
-import { StaffCard } from "@/components/StaffCard";
+import { StaffCard } from "@/components/staff/StaffCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Filter, MoreVertical, Eye, Pencil, Trash2 } from "lucide-react";
@@ -43,7 +43,7 @@ import { format, parseISO } from "date-fns";
 import Link from "next/link";
 import { toast } from "sonner";
 import { getStaff, deactivateStaff } from "@/lib/api/staff"; // Your staff APIs
-import StaffModal from "@/components/StaffModal";
+import StaffModal from "@/components/staff/StaffModal";
 import {
   AlertDialog,
   AlertDialogAction,

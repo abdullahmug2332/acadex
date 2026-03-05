@@ -17,8 +17,7 @@ import {
 import { NavMain } from "@/components/nav-main";
 import { PiStudentLight } from "react-icons/pi";
 import { GraduationCap, User, Users } from "lucide-react";
-import { AiOutlineUser } from "react-icons/ai";
-import { HiOutlineUserGroup } from "react-icons/hi";
+import { Building2 } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -30,6 +29,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useSidebar } from "@/components/ui/sidebar";
+import { FaUserTie } from "react-icons/fa";
 // This is sample data.
 const data = {
   navMain: [
@@ -51,7 +51,7 @@ const data = {
     {
       title: "Teachers",
       url: "#",
-      icon: User,
+      icon: FaUserTie,
       items: [
         {
           title: "List View",
@@ -84,6 +84,26 @@ const data = {
         {
           title: "Trash",
           url: "/staff/trash",
+        },
+      ],
+    },
+    {
+      title: "Departments",
+      url: "#",
+      icon: Building2,
+      isActive: true,
+      items: [
+        {
+          title: "List View",
+          url: "/departments/list-view",
+        },
+        {
+          title: "Create Department",
+          url: "/departments/create-department",
+        },
+        {
+          title: "Trash",
+          url: "/departments/trash",
         },
       ],
     },

@@ -50,7 +50,7 @@ export default function StaffModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-[90%] max-w-[80%] lg:max-w-[700px]!">
         <DialogHeader>
           <DialogTitle className="text-primary">
             Staff Details
@@ -61,9 +61,9 @@ export default function StaffModal({
         </DialogHeader>
 
         {!loading && staff && (
-          <div className="space-y-4 mt-2">
-            <Table className="w-full">
-              <TableBody>
+          <div className="space-y-4 mt-2">  
+            <Table className="w-full   ">
+              <TableBody className="grid md:grid-cols-2">
                 <TableRow>
                   <TableCell className="font-medium">UID</TableCell>
                   <TableCell>{staff.uid}</TableCell>
@@ -93,7 +93,11 @@ export default function StaffModal({
 
                 <TableRow>
                   <TableCell className="font-medium">Gender</TableCell>
-                  <TableCell>{staff.gender}</TableCell>
+                  <TableCell className="capitalize">{staff.gender}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">DOB</TableCell>
+                  <TableCell>{staff.date_of_birth}</TableCell>
                 </TableRow>
 
                 <TableRow>
@@ -104,6 +108,14 @@ export default function StaffModal({
                 <TableRow>
                   <TableCell className="font-medium">Department</TableCell>
                   <TableCell>{staff.department || "-"}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Qualification</TableCell>
+                  <TableCell>{staff.qualification || "-"}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Experience</TableCell>
+                  <TableCell>{staff.experience || "-"}</TableCell>
                 </TableRow>
 
                 <TableRow>
@@ -116,6 +128,14 @@ export default function StaffModal({
                   <TableCell>
                     {staff.hired_date
                       ? format(parseISO(staff.hired_date), "MM/dd/yyyy")
+                      : "-"}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Created at </TableCell>
+                  <TableCell>
+                    {staff.created_at
+                      ? format(parseISO(staff.created_at), "MM/dd/yyyy")
                       : "-"}
                   </TableCell>
                 </TableRow>
