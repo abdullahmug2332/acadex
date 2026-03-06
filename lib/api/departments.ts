@@ -3,13 +3,6 @@ import { Department } from "@/types/Departments";
 import { DepartmentForm } from "@/types/Departments"; 
 import { GetDepartmentsResponse } from "@/types/Departments"; 
 
-// ✅ Get all Departments with pagination, search, and status filter
-
-
-
-
-
-
 export const getDepartments = async (
   page: number = 1,
   limit: number = 10,

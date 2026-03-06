@@ -142,7 +142,7 @@ export default function SubjectsList() {
     <main className="flex flex-col gap-2.5 w-full">
       {/* Header */}
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 sm:gap-0">
         <Heading title="Trahsed Subjects" />
 
         <div className="flex items-center gap-2 md:gap-3 flex-wrap sm:flex-nowrap justify-end lg:w-[50%] xl:w-[40%]">
@@ -151,7 +151,7 @@ export default function SubjectsList() {
             placeholder="Search by name or code..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="grow! flex-1! py-1!"
+            className="grow! flex-1! py-1! min-w-[200px]"
           />
 
           {/* View Mode */}

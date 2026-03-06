@@ -41,6 +41,7 @@ export default function Auth() {
     setError("");
 
     try {
+      setLoading(true)
       const data = await loginUser(email, password);
       dispatch(setUser(data.user));
       toast.success("User Login successfully!");
@@ -50,6 +51,9 @@ export default function Auth() {
       dispatch(clearUser());
 
       setError(err.response?.data?.error || "Something went wrong");
+    }finally{
+      setLoading(false)
+
     }
   };
   if (loading) return <p>Loadingg...</p>;
@@ -118,7 +122,10 @@ export default function Auth() {
           )}
 
           <Button type="submit" className="btn w-full">
-            Log In
+            {
+              loading ? "Logging In":"Log In"
+            }
+
           </Button>
         </form>
       </div>

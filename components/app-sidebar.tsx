@@ -22,6 +22,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSidebar } from "@/components/ui/sidebar";
 import { FaUserTie } from "react-icons/fa";
+import { Calendar } from "lucide-react";
 // This is sample data.
 const data = {
   navMain: [
@@ -116,6 +117,26 @@ const data = {
         {
           title: "Trash",
           url: "/subjects/trash",
+        },
+      ],
+    },
+    {
+      title: "Academic Years",
+      url: "#",
+      icon: Calendar,
+      isActive: true,
+      items: [
+        {
+          title: "List View",
+          url: "/academic-years/list-view",
+        },
+        {
+          title: "Create Academic Year",
+          url: "/academic-years/create-academic-year",
+        },
+        {
+          title: "Trash",
+          url: "/academic-years/trash",
         },
       ],
     },

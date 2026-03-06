@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { CiBoxList } from "react-icons/ci";
 import { FaRegAddressCard } from "react-icons/fa";
-import { Building2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Heading from "@/components/Heading";
 import { Input } from "@/components/ui/input";
@@ -21,11 +20,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, Eye, Trash2, Pencil, BookOpen } from "lucide-react";
+import { MoreVertical, Eye, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,43 +35,23 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { PiRecycleLight } from "react-icons/pi";
+import { Calendar } from "lucide-react";
 
 import {
-  getSubjects,
-  deactivateSubject,
-  getSubjectById,
-} from "@/lib/api/subjects";
-import { getDepartmentById } from "@/lib/api/departments";
-import SubjectModal from "@/components/subjects/SubjectsModal";
+  getAcademicYears,
+  restoreAcademicYear,
+  deleteAcademicYear,
+} from "@/lib/api/academic-years";
+import AcademicYearModal from "@/components/academic-years/AcademicYearModal";
 
 
-export default function SubjectsList() {
-  const [subjects, setSubjects] = useState<any[]>([]);
+
+export default function page() {
+  const [academicYears, setAcademicYears] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [departmentNames, setDepartmentNames] = useState<
-    Record<number, string>
-  >({});
   const [modalOpen, setModalOpen] = useState(false);
   const [modalId, setModalId] = useState<number>(0);
-  useEffect(() => {
-    const fetchDepartmentNames = async () => {
-      const map: Record<number, string> = {};
-
-      for (const subject of subjects) {
-        try {
-          const dept = await getDepartmentById(subject.department_id);
-          map[subject.department_id] = dept.name;
-        } catch {
-          map[subject.department_id] = "Unknown";
-        }
-      }
-
-      setDepartmentNames(map);
-    };
-
-    if (subjects.length) fetchDepartmentNames();
-  }, [subjects]);
-
   const [viewMode, setViewMode] = useState<"card" | "list">("list");
   const [search, setSearch] = useState("");
 
@@ -81,44 +59,52 @@ export default function SubjectsList() {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [total, setTotal] = useState(0);
-
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
-  const fetchSubjects = async (page: number = 1) => {
+  const fetchAcademicYears = async (page: number = 1) => {
     setLoading(true);
     try {
-      const { subjects, total } = await getSubjects(
+      const { academic_years, total } = await getAcademicYears(
         page,
         limit,
         search,
-        "active",
+        "inactive" // 🔥 only trashed academic years
       );
-
-      setSubjects(subjects);
+      setAcademicYears(academic_years);
       setTotal(total);
     } catch (err: any) {
-      toast.error(err.message || "Failed to fetch subjects");
+      toast.error(err.message || "Failed to fetch academic years");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchSubjects(page);
+    fetchAcademicYears(page);
   }, [page]);
 
   useEffect(() => {
     setPage(1);
-    fetchSubjects(1);
+    fetchAcademicYears(1);
   }, [search]);
 
-  const handleDeactivate = async (id: number) => {
+  const handleRestore = async (id: number) => {
     try {
-      await deactivateSubject(id);
-      toast.success("Subject moved to trash successfully");
-      fetchSubjects(page);
+      await restoreAcademicYear(id);
+      toast.success("Academic year restored successfully");
+      fetchAcademicYears(page);
     } catch (err: any) {
-      toast.error(err.message || "Failed to deactivate subject");
+      toast.error(err.message || "Failed to restore");
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteAcademicYear(id);
+      toast.success("Academic year permanently deleted");
+      fetchAcademicYears(page);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete");
     }
   };
 
@@ -127,25 +113,20 @@ export default function SubjectsList() {
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
   };
 
- 
-
   return (
     <main className="flex flex-col gap-2.5 w-full">
       {/* Header */}
-
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 sm:gap-0">
-        <Heading title="Subjects" />
-
+        <Heading title="Trashed Academic Years" />
         <div className="flex items-center gap-2 md:gap-3 flex-wrap sm:flex-nowrap justify-end lg:w-[50%] xl:w-[40%]">
           {/* Search */}
           <Input
-            placeholder="Search by name or code..."
+            placeholder="Search by name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="grow! flex-1! py-1! min-w-[200px]"
           />
 
-          {/* View Mode */}
           <div className="flex items-center gap-2 p-1 px-3 rounded-md border">
             <CiBoxList
               className={cn(
@@ -154,7 +135,6 @@ export default function SubjectsList() {
               )}
               onClick={() => setViewMode("list")}
             />
-
             <FaRegAddressCard
               className={cn(
                 "size-5 cursor-pointer",
@@ -163,36 +143,28 @@ export default function SubjectsList() {
               onClick={() => setViewMode("card")}
             />
           </div>
-
-          <Link href="/subjects/create-subject">
-            <Button className="gap-2">
-              <Plus className="w-4 h-4" />
-              Create Subject
-            </Button>
-          </Link>
         </div>
       </div>
 
-      {/* Subjects Table/Card */}
-
+      {/* Content */}
       <div className="w-full overflow-x-auto">
         {loading ? (
-          <p className="text-center py-10">Loading subjects...</p>
-        ) : subjects.length === 0 ? (
+          <p className="text-center py-10">Loading academic years...</p>
+        ) : academicYears.length === 0 ? (
           <p className="text-center text-muted-foreground mt-4">
-            No subjects found.
+            No trashed academic years found.
           </p>
         ) : viewMode === "card" ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {subjects.map((subject) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {academicYears.map((year) => (
               <div
-                key={subject.id}
+                key={year.id}
                 className="bg-white rounded-lg border p-6 shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start justify-between mb-4">
-                  <div className="flex gap-2 items-center">
-                    <BookOpen className="text-primary text-[20px]" />
-                    <h3 className="font-semibold text-lg">{subject.code}</h3>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="text-primary mb-1" />
+                    <h3 className="font-semibold text-lg mb-2">{year.name}</h3>
                   </div>
 
                   <DropdownMenu>
@@ -206,48 +178,45 @@ export default function SubjectsList() {
                       <DropdownMenuItem
                         onClick={() => {
                           setModalOpen(true);
-                          setModalId(subject.id);
+                          setModalId(year.id);
                         }}
                       >
                         <Eye className="w-4 h-4 text-primary mr-2" /> View
                       </DropdownMenuItem>
 
-                      <Link href={`/subjects/edit-subject/${subject.id}`}>
-                        <DropdownMenuItem>
-                          <Pencil className="w-4 h-4 text-primary mr-2" />
-                          Edit
-                        </DropdownMenuItem>
-                      </Link>
+                      <DropdownMenuItem onClick={() => handleRestore(year.id)}>
+                        <PiRecycleLight className="w-4 h-4 text-primary mr-2" />
+                        Restore
+                      </DropdownMenuItem>
 
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <DropdownMenuItem
-                            className="flex items-center gap-2 text-red-600 hover:text-red-600!"
+                            className="flex items-center gap-2 text-red-600 cursor-pointer"
                             onSelect={(e) => e.preventDefault()}
                           >
-                            <Trash2 className="w-4 h-4 mr-2 text-red-600 " />
-                            Trash
+                            <Trash2 className="w-4 h-4 mr-2 text-red-600" />
+                            Delete Permanently
                           </DropdownMenuItem>
                         </AlertDialogTrigger>
 
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>
-                              Are you absolutely sure?
+                              Permanently Delete?
                             </AlertDialogTitle>
                             <AlertDialogDescription>
-                              This action will move this subject to trash.
+                              This action cannot be undone. This will permanently delete this academic year.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
 
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-
                             <AlertDialogAction
-                              onClick={() => handleDeactivate(subject.id)}
-                              className="bg-red-600 hover:bg-red-700"
+                              onClick={() => handleDelete(year.id)}
+                              className="bg-red-600 hover:bg-red-700 cursor-pointer"
                             >
-                              Yes, Trash
+                              Delete
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -256,13 +225,8 @@ export default function SubjectsList() {
                   </DropdownMenu>
                 </div>
 
-                <p className="font-semibold text-lg "> {subject.name}</p>
-                <p className="text-sm mb-2">{truncate(subject.description)}</p>
-
-                <p className=" mb-2 flex gap-1 items-center text-md">
-                  <Building2 className="text-primary size-5 !" />{" "}
-                  {departmentNames[subject.department_id] || "Loading..."}
-                </p>
+                <p className="text-sm mb-2">Start: {year.start_date || "-"}</p>
+                <p className="text-sm mb-2">End: {year.end_date || "-"}</p>
               </div>
             ))}
           </div>
@@ -271,23 +235,18 @@ export default function SubjectsList() {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Code</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Department</TableHead>
+                <TableHead>Start Date</TableHead>
+                <TableHead>End Date</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {subjects.map((subject) => (
-                <TableRow key={subject.id}>
-                  <TableCell>{subject.name}</TableCell>
-                  <TableCell>{subject.code}</TableCell>
-                  <TableCell>{truncate(subject.description)}</TableCell>
-                  <TableCell>
-                    {departmentNames[subject.department_id] || "Loading..."}
-                  </TableCell>
-
+              {academicYears.map((year) => (
+                <TableRow key={year.id}>
+                  <TableCell>{year.name}</TableCell>
+                  <TableCell>{year.start_date}</TableCell>
+                  <TableCell>{year.end_date}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -302,51 +261,47 @@ export default function SubjectsList() {
 
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
-                        onClick={() => {
-                          setModalOpen(true);
-                          setModalId(subject.id);
-                        }}
-                      >
-                        <Eye className="w-4 h-4 text-primary mr-2" /> View
-                      </DropdownMenuItem>
+                          onClick={() => {
+                            setModalOpen(true);
+                            setModalId(year.id);
+                          }}
+                        >
+                          <Eye className="w-4 h-4 text-primary mr-2" /> View
+                        </DropdownMenuItem>
 
-                        <Link href={`/subjects/edit-subject/${subject.id}`}>
-                          <DropdownMenuItem>
-                            <Pencil className="w-4 h-4 text-primary mr-2" />
-                            Edit
-                          </DropdownMenuItem>
-                        </Link>
+                        <DropdownMenuItem onClick={() => handleRestore(year.id)}>
+                          <PiRecycleLight className="w-4 h-4 text-primary mr-2" />
+                          Restore
+                        </DropdownMenuItem>
 
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <DropdownMenuItem
-                              className="text-red-600 hover:text-red-600!"
+                              className="flex items-center gap-2 text-red-600 cursor-pointer"
                               onSelect={(e) => e.preventDefault()}
                             >
-                              <Trash2 className="w-4 h-4 mr-2 text-red-600!" />
-                              Trash
+                              <Trash2 className="w-4 h-4 mr-2 text-red-600" />
+                              Delete Permanently
                             </DropdownMenuItem>
                           </AlertDialogTrigger>
 
                           <AlertDialogContent>
                             <AlertDialogHeader>
                               <AlertDialogTitle>
-                                Are you absolutely sure?
+                                Permanently Delete?
                               </AlertDialogTitle>
-
                               <AlertDialogDescription>
-                                This action will move this subject to trash.
+                                This action cannot be undone. This will permanently delete this academic year.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
 
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
-
                               <AlertDialogAction
-                                onClick={() => handleDeactivate(subject.id)}
-                                className="bg-red-600 hover:bg-red-700!"
+                                onClick={() => handleDelete(year.id)}
+                                className="bg-red-600 hover:bg-red-700 cursor-pointer"
                               >
-                                Yes, Trash
+                                Delete
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
@@ -360,19 +315,25 @@ export default function SubjectsList() {
           </Table>
         )}
       </div>
-      <SubjectModal
+
+      {/* Modal */}
+      <AcademicYearModal
         id={modalId.toString()}
         open={modalOpen}
         onOpenChange={setModalOpen}
       />
 
       {/* Pagination */}
-
       <div className="flex justify-center mt-4 gap-2 items-center">
         <Button
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
           disabled={page === 1}
-          className="px-3 py-1 rounded flex gap-1 items-center"
+          className={cn(
+            page === 1
+              ? "bg-primary text-white cursor-not-allowed"
+              : "bg-primary hover:bg-primary",
+            "px-3 py-1 rounded flex gap-1 items-center",
+          )}
         >
           <IoIosArrowBack /> Prev
         </Button>
@@ -384,7 +345,12 @@ export default function SubjectsList() {
         <Button
           onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
           disabled={page === totalPages}
-          className="px-3 py-1 rounded flex gap-1 items-center"
+          className={cn(
+            page === totalPages
+              ? "bg-primary text-white cursor-not-allowed"
+              : "bg-primary hover:bg-primary",
+            "px-3 py-1 rounded flex gap-1 items-center",
+          )}
         >
           Next <IoIosArrowForward />
         </Button>
